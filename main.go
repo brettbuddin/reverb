@@ -96,10 +96,8 @@ func run(args []string) error {
 		out = make([]float64, len(input.Data)+len(ir.Data)-1)
 		in  = input.Data
 	)
-	for i := 0; i < len(out); i += numChannels * blockSize {
-		for _, conv := range convolvers {
-			conv.Convolve(out[i:], in[min(i, len(in)):], blockSize)
-		}
+	for _, conv := range convolvers {
+		conv.Convolve(out, in, len(out))
 	}
 
 	dest, err := os.OpenFile(outFile, os.O_CREATE|os.O_WRONLY, 0644)
