@@ -88,16 +88,16 @@ func run(args []string) error {
 		}
 	}
 
-	var (
-		// Convolution causes a phase-shift in the output. This shift is
-		// proportional to the size of the impulse response. Adding the IR
-		// length here allows us to fully capture the tail of the reverb,
-		// without ending abruptly.
-		out = make([]float64, len(input.Data)+len(ir.Data)-1)
-		in  = input.Data
-	)
+	// Convolution causes a time-domain shift in the output. This shift is
+	// proportional to the size of the impulse response. Adding the IR length
+	// here allows us to fully capture the tail of the reverb, without ending
+	// abruptly.
+	out := make([]float64, len(input.Data)+len(ir.Data)-1)
+
+	// Convolve each channel. The Convolver takes care of offsets for its
+	// respective channel (configured earlier).
 	for _, conv := range convolvers {
-		conv.Convolve(out, in, len(out))
+		conv.Convolve(out, input.Data, len(out))
 	}
 
 	dest, err := os.OpenFile(outFile, os.O_CREATE|os.O_WRONLY, 0644)
